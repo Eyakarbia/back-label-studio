@@ -1,11 +1,20 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
 const mongoose = require('./app/config/db');
 
-app.use(express.json()); // Ensure JSON parsing middleware is enabled
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
+// Configure session middleware
+app.use(session({
+    secret: 'your-secret-key', // Replace with your own secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
 
 // Other routes and middleware...
-
 app.use('/api', require('./app/router'));
 
 app.listen(2000, () => {
