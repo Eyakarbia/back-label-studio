@@ -1,4 +1,7 @@
-const User = require('./model'); // Correct import path assuming 'model.js' is in the same directory
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('./model');
+const key = "74b15e3c7e4ff240879ba82a7f4e084069742e973c3e37e0e02589c53efc7ec4eccc1a238062bf9fc1b89a2a850863d012930e3d12d0fee6e2cce6537e909f10";
 
 let controller = {};
 
@@ -16,8 +19,6 @@ controller.get = async (req, res) => {
 controller.login = async (req, res) => {
     const { email, password } = req.body;
 
-    console.log('Request Body:', req.body); // Log request body for debugging
-
     try {
         // Check if email is provided
         if (!email) {
@@ -30,8 +31,10 @@ controller.login = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Check if password matches
-        if (user.password !== password) {
+        // Compare passwords
+        const isMatch = await user.comparePassword(password);
+
+        if (!isMatch) {
             return res.status(401).json({ message: 'Incorrect password' });
         }
 
@@ -45,6 +48,32 @@ controller.login = async (req, res) => {
     }
 };
 
+controller.register = async (req, res) => {
+    const { userName, email, password } = req.body;
 
+    try {
+        // Check if user already exists
+        const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt();
+        const hashPassword = await bcrypt.hash(password, salt);
+
+        // Create new user
+        await User.create({
+            userName,
+            email,
+            password: hashPassword
+        });
+
+        res.json({ msg: 'Register successful' });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ msg: 'Registration failed', error });
+    }
+};
 
 module.exports = controller;
