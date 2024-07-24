@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./model');
 const key = "74b15e3c7e4ff240879ba82a7f4e084069742e973c3e37e0e02589c53efc7ec4eccc1a238062bf9fc1b89a2a850863d012930e3d12d0fee6e2cce6537e909f10";
 
+
 let controller = {};
 
 
