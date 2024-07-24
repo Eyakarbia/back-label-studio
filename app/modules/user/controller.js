@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./model');
 const key = "74b15e3c7e4ff240879ba82a7f4e084069742e973c3e37e0e02589c53efc7ec4eccc1a238062bf9fc1b89a2a850863d012930e3d12d0fee6e2cce6537e909f10";
+const mongoose = require('mongoose'); 
 
 
 let controller = {};
@@ -88,5 +89,26 @@ controller.register = async (req, res) => {
     }
 };
 
+controller.getProfileById = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Validate the ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error('Error fetching user by ID:', err.message);
+        res.status(500).send('Internal server error');
+    }
+};
 
 module.exports = controller;

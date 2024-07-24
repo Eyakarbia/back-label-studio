@@ -6,5 +6,6 @@ const controller = require('./controller'); // Import your controller
 router.get('/get', controller.get); // Example GET route
 router.post('/login', controller.login); // Example POST route for login
 router.post('/register', controller.register);
+router.get('/profile/:id', controller.getProfileById);
 
 module.exports = router;
