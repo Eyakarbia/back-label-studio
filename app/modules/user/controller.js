@@ -25,6 +25,7 @@ controller.login = async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
+        // Find user by email
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -32,16 +33,25 @@ controller.login = async (req, res) => {
         }
 
         // Compare passwords
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(401).json({ message: 'Incorrect password' });
         }
 
-        // Set session or JWT token for authenticated user
-        req.session.user = user; // Example using session (requires express-session)
+        // Create JWT token
+        const token = jwt.sign({ email: user.email, id: user._id }, key, { expiresIn: "7d" });
 
-        res.json({ message: 'Login successful', user });
+        // Verify the token
+        jwt.verify(token, key, (err, decodedToken) => {
+            if (err) {
+                console.error('Token verification error:', err);
+                return res.status(401).json({ message: 'Invalid token' });
+            } else {
+                console.log('Decoded Token:', decodedToken);
+                res.json({ token, message: "Login successful" });
+            }
+        });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: 'Internal server error' });
@@ -62,11 +72,12 @@ controller.register = async (req, res) => {
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
 
-        // Create new user
+        // Create new user with default role 'secretary'
         await User.create({
             userName,
             email,
-            password: hashPassword
+            password: hashPassword,
+            role: 'secretary'  // Default role set to 'secretary'
         });
 
         res.json({ msg: 'Register successful' });
@@ -75,5 +86,6 @@ controller.register = async (req, res) => {
         res.status(500).json({ msg: 'Registration failed', error });
     }
 };
+
 
 module.exports = controller;
