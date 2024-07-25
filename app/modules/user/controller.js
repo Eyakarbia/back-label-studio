@@ -5,7 +5,7 @@ const key = "74b15e3c7e4ff240879ba82a7f4e084069742e973c3e37e0e02589c53efc7ec4ecc
 const mongoose = require('mongoose'); 
 
 
-let controller = {};
+let controller= {};
 
 
 controller.get = async (req, res) => {
