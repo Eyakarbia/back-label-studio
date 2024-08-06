@@ -55,7 +55,7 @@ controller.requestPasswordReset = async (req, res) => {
             service: 'Gmail',
             auth: {
                 user: 'tasnimmtir586@gmail.com',
-                pass: 'tdzo fbhl xecd opuv' // Replace with the actual app password
+                pass: 'tdzo fbhl xecd opuv' 
             }
         });
 
