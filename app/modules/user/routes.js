@@ -10,4 +10,10 @@ router.get('/profile/:id', controller.getProfileById);
 router.post('/resetpassword', controller.requestPasswordReset);
 
 
+
+
+
+
+
+
 module.exports = router;

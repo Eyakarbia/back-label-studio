@@ -7,8 +7,13 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, required: true },
+<<<<<<< HEAD
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date }
+=======
+    phone:{  type: String, required: true },
+    addresse:{ type: String, required: true }
+>>>>>>> 65191f289b54f2fbb1a8425424a029ca11568463
 });
 
 // Method to compare passwords
