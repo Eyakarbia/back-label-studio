@@ -133,15 +133,12 @@ controller.login = async (req, res) => {
 };
 
 controller.register = async (req, res) => {
-    const { userName, email, password, phone, addresse } = req.body;
-
-    console.log('Register request received:', { userName, email, phone, addresse });
+    const { userName, email, password } = req.body;
 
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
         if (existingUser) {
-            console.log('User already exists:', existingUser);
             return res.status(400).json({ message: 'User already exists' });
         }
 
@@ -150,25 +147,19 @@ controller.register = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, salt);
 
         // Create new user with default role 'secretary'
-        const newUser = new User({
+        await User.create({
             userName,
             email,
             password: hashPassword,
-            role: 'secretary',  // Default role set to 'secretary'
-            phone,
-            addresse
+            role: 'secretary'  // Default role set to 'secretary'
         });
 
-        await newUser.save();
-
-        console.log('New user registered:', newUser);
         res.json({ msg: 'Register successful' });
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ msg: 'Registration failed', error: error.message });
+        res.status(500).json({ msg: 'Registration failed', error });
     }
 };
-
 
 controller.getProfileById = async (req, res) => {
     try {
