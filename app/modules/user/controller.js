@@ -3,8 +3,81 @@ const jwt = require('jsonwebtoken');
 const User = require('./model');
 const key = "74b15e3c7e4ff240879ba82a7f4e084069742e973c3e37e0e02589c53efc7ec4eccc1a238062bf9fc1b89a2a850863d012930e3d12d0fee6e2cce6537e909f10";
 const mongoose = require('mongoose'); 
-
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 let controller = {};
+
+const generateRandomPassword = (length = 12) => {
+    const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
+    const numberChars = '0123456789';
+    const allChars = upperCaseChars + lowerCaseChars + numberChars;
+
+    if (length < 8) {
+        throw new Error('Password length must be at least 8 characters');
+    }
+
+    let password = '';
+    // Ensure at least one character from each set is included
+    password += upperCaseChars[Math.floor(Math.random() * upperCaseChars.length)];
+    password += lowerCaseChars[Math.floor(Math.random() * lowerCaseChars.length)];
+    password += numberChars[Math.floor(Math.random() * numberChars.length)];
+
+    // Fill the rest of the password length with random characters from allChars
+    for (let i = 3; i < length; i++) {
+        password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+
+    // Shuffle password to ensure randomness
+    return password.split('').sort(() => Math.random() - 0.5).join('');
+};
+
+controller.requestPasswordReset = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Generate a new random password
+        const newPassword = generateRandomPassword(); // Generate a random password
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update user password in the database
+        user.password = hashedPassword;
+        await user.save();
+
+        // Send email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'tasnimmtir586@gmail.com',
+                pass: 'tdzo fbhl xecd opuv' // Replace with the actual app password
+            }
+        });
+
+        const mailOptions = {
+            to: user.email,
+            from: 'tasnimmtir586@gmail.com',
+            subject: 'Password Reset',
+            text: `Your password has been reset.\n\n
+                   Your new password is: ${newPassword}\n\n
+                   Please log in with this new password and change it as soon as possible.\n`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: 'Password has been reset and new password sent to email' });
+    } catch (err) {
+        console.error('Error sending password reset email:', err);
+        res.status(500).send('Internal server error');
+    }
+};
+
+
 
 
 controller.get = async (req, res) => {
@@ -41,7 +114,7 @@ controller.login = async (req, res) => {
         }
 
         // Create JWT token
-        const token = jwt.sign({ email: user.email, id: user._id }, key, { expiresIn: "7d" });
+        const token = jwt.sign({ email: user.email, id: user.id }, key, { expiresIn: "7d" });
 
         // Verify the token
         jwt.verify(token, key, (err, decodedToken) => {
@@ -109,5 +182,6 @@ controller.getProfileById = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 
 module.exports = controller;
