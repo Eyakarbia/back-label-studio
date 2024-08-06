@@ -68,4 +68,5 @@ const updatePatient = async (req, res) => {
     }
 };
 
+
 module.exports = { addpatient, deletePatient, getPatientById, updatePatient };
