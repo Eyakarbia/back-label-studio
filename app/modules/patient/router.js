@@ -1,5 +1,5 @@
 const express = require('express');
-const { addpatient, deletePatient, getPatientById, updatePatient } = require('./patientcontrolleur'); // Update import if needed
+const { addpatient, deletePatient, getAllPatients,  updatePatient } = require('./patientcontrolleur'); // Update import if needed
 const router = express.Router();
 
 // POST /api/patients
@@ -9,7 +9,7 @@ router.post('/add', addpatient);
 router.delete('/:id', deletePatient);
 
 // GET /api/patients/:id
-router.get('/:id', getPatientById);
+router.get('/all', getAllPatients);
 
 // PUT /api/patients/:id
 router.put('/:id', updatePatient);

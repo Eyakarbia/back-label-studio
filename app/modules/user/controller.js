@@ -133,7 +133,7 @@ controller.login = async (req, res) => {
 };
 
 controller.register = async (req, res) => {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, phone } = req.body;
 
     try {
         // Check if user already exists
@@ -151,6 +151,7 @@ controller.register = async (req, res) => {
             userName,
             email,
             password: hashPassword,
+            phone,  
             role: 'secretary'  // Default role set to 'secretary'
         });
 
@@ -160,6 +161,7 @@ controller.register = async (req, res) => {
         res.status(500).json({ msg: 'Registration failed', error });
     }
 };
+
 
 controller.getProfileById = async (req, res) => {
     try {

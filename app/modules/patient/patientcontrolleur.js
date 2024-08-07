@@ -33,17 +33,13 @@ const deletePatient = async (req, res) => {
 };
 
 // Get a patient by ID
-const getPatientById = async (req, res) => {
-    const { id } = req.params;
+const getAllPatients = async (req, res) => {
     try {
-        const patientData = await patient.findById(id);
-        if (!patientData) {
-            return res.status(404).json({ msg: "Patient not found" });
-        }
-        res.json(patientData);
+        const patients = await patient.find(); // Fetch all patients
+        res.json(patients);
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ msg: "Error retrieving patient", error });
+        return res.status(500).json({ msg: "Error retrieving patients", error });
     }
 };
 
@@ -69,4 +65,4 @@ const updatePatient = async (req, res) => {
 };
 
 
-module.exports = { addpatient, deletePatient, getPatientById, updatePatient };
+module.exports = { addpatient, deletePatient, getAllPatients, updatePatient };
