@@ -18,44 +18,43 @@ const generateRandomPassword = (length = 12) => {
     }
 
     let password = '';
-    // Ensure at least one character from each set is included
     password += upperCaseChars[Math.floor(Math.random() * upperCaseChars.length)];
     password += lowerCaseChars[Math.floor(Math.random() * lowerCaseChars.length)];
     password += numberChars[Math.floor(Math.random() * numberChars.length)];
 
-    // Fill the rest of the password length with random characters from allChars
     for (let i = 3; i < length; i++) {
         password += allChars[Math.floor(Math.random() * allChars.length)];
     }
 
-    // Shuffle password to ensure randomness
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+
+    console.log('Generated Password:', password);  // Debug log
+    return password;
 };
 
 controller.requestPasswordReset = async (req, res) => {
     try {
+        console.log('Request Body:', req.body);  // Debug log
+
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Generate a new random password
-        const newPassword = generateRandomPassword(); // Generate a random password
+        const newPassword = generateRandomPassword();
+        console.log('New Password:', newPassword);  // Debug log
 
-        // Hash the new password
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        // Update user password in the database
         user.password = hashedPassword;
         await user.save();
 
-        // Send email
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
                 user: 'tasnimmtir586@gmail.com',
-                pass: 'tdzo fbhl xecd opuv' // Replace with the actual app password
+                pass: 'tdzo fbhl xecd opuv'  // Use environment variables for sensitive info
             }
         });
 
@@ -69,6 +68,7 @@ controller.requestPasswordReset = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully');  // Debug log
 
         res.status(200).json({ message: 'Password has been reset and new password sent to email' });
     } catch (err) {
@@ -76,6 +76,7 @@ controller.requestPasswordReset = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 
 
 

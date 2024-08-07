@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     role: { type: String, required: true },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-    phone:{  type: String, required: true },
+    phone:{  type: String,  },
+    addresse:{ type: String, }
 });
 
 // Method to compare passwords
