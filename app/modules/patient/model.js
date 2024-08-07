@@ -6,7 +6,6 @@ const patientSchema = new Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
-    etablissment: { type: Schema.Types.ObjectId, ref: 'User' }, // Assuming etablissment references a User
 });
 
 module.exports = mongoose.model('patient', patientSchema);
