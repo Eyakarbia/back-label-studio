@@ -188,7 +188,7 @@ controller.getProfileById = async (req, res) => {
 
 controller.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { userName, email, password } = req.body;
+    const { userName, email, password, phone } = req.body;
 
     try {
         // Validate the ObjectId
@@ -209,7 +209,7 @@ controller.updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt();
             user.password = await bcrypt.hash(password, salt);
         }
-
+        if (phone) user.phone = phone;
         // Save the updated user
         await user.save();
 
@@ -219,5 +219,6 @@ controller.updateUser = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 
 module.exports = controller;
