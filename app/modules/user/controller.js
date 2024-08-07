@@ -184,5 +184,38 @@ controller.getProfileById = async (req, res) => {
     }
 };
 
+controller.updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { userName, email, password } = req.body;
+
+    try {
+        // Validate the ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        // Find the user by ID
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update user details
+        if (userName) user.userName = userName;
+        if (email) user.email = email;
+        if (password) {
+            const salt = await bcrypt.genSalt();
+            user.password = await bcrypt.hash(password, salt);
+        }
+
+        // Save the updated user
+        await user.save();
+
+        res.json({ message: 'User updated successfully', user });
+    } catch (err) {
+        console.error('Error updating user:', err.message);
+        res.status(500).send('Internal server error');
+    }
+};
 
 module.exports = controller;

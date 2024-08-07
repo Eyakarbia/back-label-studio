@@ -8,6 +8,8 @@ router.post('/login', controller.login); // Example POST route for login
 router.post('/register', controller.register);
 router.get('/profile/:id', controller.getProfileById);
 router.post('/resetpassword', controller.requestPasswordReset);
+router.post('/update/:id', controller.updateUser);
+
 
 
 
